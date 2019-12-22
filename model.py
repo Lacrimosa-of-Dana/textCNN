@@ -3,7 +3,7 @@ import tensorflow.compat.v1 as tf
 
 class TextCNN:
     def __init__(self, class_num, sequence_size, vocabulary_size,
-                 embed_size, embed_model, filter_sizes, filter_num) :
+                 embed_size, embed_model, filter_sizes, filter_num):
         self.class_num = class_num
         self.sequence_size = sequence_size
 
@@ -41,7 +41,7 @@ class TextCNN:
             bias = tf.Variable(
                 tf.constant(0.1, shape=[self.filter_num], dtype=tf.float32), name='bias')
             conv = tf.cast(tf.nn.conv2d(self.embedded_words, filter_core, strides=[1, 1, 1, 1],
-                                padding='VALID', name='convolution'), tf.float32)
+                                        padding='VALID', name='convolution'), tf.float32)
             h = tf.nn.relu(tf.nn.bias_add(conv, bias), name='relu')
             pool = tf.nn.max_pool(h, ksize=[1, self.sequence_size - filter_size + 1, 1, 1],
                                   strides=[1, 1, 1, 1], padding='VALID')

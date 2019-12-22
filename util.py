@@ -1,14 +1,38 @@
+import os
+
 import numpy as np
 import pandas as pd
 
-from preparation import word_to_index
+
+def split_dataset(path):
+    df = pd.read_csv(os.path.join(path, 'all.csv'), lineterminator='\n')
+    df = df.sample(frac=1, random_state=41)
+    total = len(df)
+    train = int(total * 0.8)
+    train_df = df[:train]
+    test_df = df[train:]
+    train_df.to_csv(os.path.join(path, 'train.csv'))
+    test_df.to_csv(os.path.join(path, 'test.csv'))
+
+
+def word_to_index(path):
+    df = pd.read_csv(os.path.join(path, 'all.csv'), lineterminator='\n')
+    word_dict = {'unknown': 0}
+    data = list(df['review'])
+    index = 1
+    for s_index, sentence in enumerate(data):
+        for w_index, word in enumerate(sentence.split()):
+            if word_dict.get(word) is None:
+                word_dict[word] = index
+                index += 1
+    return word_dict
 
 
 def load_data(path, max_word_per_sentence=295):
     df = pd.read_csv(path, lineterminator='\n').astype(str)
     labels = np.array([[0, 1] if i == 'positive' else [1, 0] for i in list(df['label'])])
     data = list(df['review'])
-    word_dict = word_to_index()
+    word_dict = word_to_index('./resources')
     x = np.zeros([len(data), max_word_per_sentence], dtype=np.int32)
     for s_index, sentence in enumerate(data):
         for w_index, word in enumerate(sentence.split()):
@@ -43,3 +67,5 @@ def batch_iter(data, batch_size, epoch_num, shuffle=True):
             yield shuffled_data[start_index:end_index]
 
 
+if __name__ == '__main__':
+    split_dataset('./resources')
